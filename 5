@@ -1,0 +1,106 @@
+MQTT Publisher
+
+Steps for terminal :
+1.source ~/mqtt-env/bin/activate
+2.pip install adafruit-blinka
+3.pip install adafruit-circuitpython-dht paho-mqtt
+4.python mqtt_dht11_rpi5.py
+
+
+
+code :
+import time
+import board
+import adafruit_dht
+import paho.mqtt.client as mqtt
+import json
+
+# MQTT broker details
+MQTT_BROKER = "broker.hivemq.com"
+MQTT_PORT = 1883
+MQTT_TOPIC = "rpi5/dht11/data"
+
+# Initialize DHT11 sensor on GPIO4 (Pin 7)
+dht_sensor = adafruit_dht.DHT11(board.D4)
+
+# Create MQTT client (no callback_api_version specified)
+client = mqtt.Client(client_id="rpi5-dht11")
+client.connect(MQTT_BROKER, MQTT_PORT, 60)
+
+print(" Sending DHT11 data to MQTT broker...")
+
+try:
+    while True:
+        try:
+            temperature = dht_sensor.temperature
+            humidity = dht_sensor.humidity
+
+            if temperature is not None and humidity is not None:
+                data = {
+                    "temperature": temperature,
+                    "humidity": humidity
+                }
+                payload = json.dumps(data)
+                print("Sending:", payload)
+                client.publish(MQTT_TOPIC, payload)
+            else:
+                print("Sensor returned None")
+
+        except RuntimeError as e:
+            print("Sensor read error:", e)
+
+        time.sleep(5)
+
+except KeyboardInterrupt:
+    print("Stopped by user.")
+
+finally:
+    client.disconnect()
+    print("MQTT disconnected.")
+
+
+
+
+
+
+
+
+
+
+MQTT Subscriber
+Steps for subscriber:
+1.sudo apt-get update
+sudo apt-get install mosquitto-clients
+2.mosquitto_sub -h broker.hivemq.com -t "rpi5/dht11/data"
+3.source ~/mqtt-env/bin/activate
+4.create file as name : mqtt_subscriber.p
+5.python mqtt_subscriber.py
+
+
+
+
+code:
+import paho.mqtt.client as mqtt
+import json
+# Called when client connects to broker
+def on_connect(client, userdata, flags, rc):
+    print(" Connected with result code", rc)
+    client.subscribe("rpi5/dht11/data")  # Subscribe to your topic
+# Called when message is received
+def on_message(client, userdata, msg):
+    try:
+        data = json.loads(msg.payload.decode())
+        temperature = data.get("temperature")
+        humidity = data.get("humidity")
+        print(f"Temp: {temperature}°C |  Humidity: {humidity}%")
+    except Exception as e:
+        print("Error decoding message:", e)
+# Set up MQTT client
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+# Connect to public broker
+client.connect("broker.hivemq.com", 1883, 60)
+# Keep listening forever
+client.loop_forever()
+
