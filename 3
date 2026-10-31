@@ -1,0 +1,69 @@
+from gpiozero import LED, MotionSensor, Buzzer
+from time import sleep
+
+led = LED(18)
+pir = MotionSensor(17)
+buzzer = Buzzer(22) # Added Buzzer on GPIO 22
+
+print('Sensor initializing and waiting for motion...')
+   while True:
+        pir.wait_for_motion()
+        print('Motion Detected!')
+        led.on()
+        buzzer.on()      # Turn buzzer on when motion is detected
+        sleep(2)         # Keep LED and buzzer on for 2 seconds
+        
+        led.off()
+        buzzer.off()     # Turn buzzer off
+        print('LED and Buzzer OFF')
+        
+        print('Waiting for area to clear...')
+        pir.wait_for_no_motion() # The code pauses here until motion stops
+        print('No Motion Detected. Area is clear.')
+        
+
+
+
+
+
+#IR
+from gpiozero import DigitalInputDevice
+from time import sleep
+# IR sensor output pin to GPIO 17
+ir_sensor = DigitalInputDevice(17) 
+
+print("IR Sensor Test...")
+try:
+    while True:
+        if ir_sensor.value == 0:   # 0 = Object detected
+            print("Object Detected")
+        else:
+            print("No Object")
+        sleep(1)
+except KeyboardInterrupt:
+    print("\nTest stopped.")
+
+
+
+
+
+#LM35
+from gpiozero import MCP3008
+from time import sleep
+# LM35 on CH0 of MCP3008
+lm35 = MCP3008(channel=0) 
+print("Reading temperature...")
+
+try:
+    while True:
+        # Read the raw value (0.0 to 1.0) and convert to voltage
+        voltage = lm35.value * 3.3          
+        
+        # LM35 gives 10mV per degree Celsius, so multiply by 100
+        temp = voltage * 100                
+        
+        print(f"Temperature: {temp:.2f} °C")
+        sleep(2)
+
+except KeyboardInterrupt:
+    print("\nTest stopped.")
