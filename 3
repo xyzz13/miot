@@ -44,6 +44,20 @@ except KeyboardInterrupt:
     print("\nTest stopped.")
 
 
+IR Sensor Module to Raspberry Pi 5
+
+IR Module Pin	Connect to Raspberry Pi 5
+VCC	3.3V or 5V (depending on module specifications; most modules support 3.3V)
+GND	GND
+OUT (Output)	GPIO 17 (Physical Pin 11)
+Obstacle Indicator LED
+
+LED	Connect to
+Anode (Long leg)	GPIO 23 (Physical Pin 16)
+Cathode (Short leg)	GND (via a 220Ω or 330Ω current-limiting resistor)
+
+
+
 
 
 
@@ -67,3 +81,29 @@ try:
 
 except KeyboardInterrupt:
     print("\nTest stopped.")
+
+
+
+
+MCP3008 to Raspberry Pi 5 (SPI Interface)
+
+MCP3008 Pin	Connect to Raspberry Pi 5
+VDD (Pin 16)	3.3V (Physical Pin 1 or 17)
+VREF (Pin 15)	3.3V (Physical Pin 1 or 17)
+AGND (Pin 14)	GND
+DGND (Pin 9)	GND
+CLK (Pin 13)	GPIO 11 / SCLK (Physical Pin 23)
+DOUT (Pin 12)	GPIO 9 / MISO (Physical Pin 21)
+DIN (Pin 11)	GPIO 10 / MOSI (Physical Pin 19)
+CS/SHDN (Pin 10)	GPIO 8 / CE0 (Physical Pin 24)
+LM35 to MCP3008
+
+LM35 Pin	Connect to
+VCC (Power)	3.3V (can share with MCP3008's VDD)
+GND	GND
+VOUT (Output)	CH0 on MCP3008
+Temperature Indicator LED
+
+LED	Connect to
+Anode (Long leg)	GPIO 18 (Physical Pin 12)
+Cathode (Short leg)	GND (via a 220Ω or 330Ω current-limiting resistor)
