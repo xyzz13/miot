@@ -1,0 +1,102 @@
+sudo apt update
+sudo apt upgrade -y
+sudo apt install python3-flask python3-gpiozero python3-lgpio -y
+mkdir ~/web-server
+cd ~/web-server
+nano app.py
+
+CODE:
+from flask import Flask, render_template
+from gpiozero import Button, LED
+from gpiozero.pins.lgpio import LGPIOFactory
+from gpiozero import Device
+
+# Force the use of the lgpio backend, required for Raspberry Pi 5
+Device.pin_factory = LGPIOFactory()
+
+app = Flask(__name__)
+
+# Hardware initialization
+button = Button(26, bounce_time=0.05)
+led_list = [LED(17), LED(18)]
+
+for led in led_list:
+    led.off()
+
+@app.route("/")
+def index():
+    # Pass the status of the first LED to the template
+    return render_template("main.html", led_state=led_list[0].is_lit)
+
+@app.route("/push-button")
+def check_push_button():
+    if button.is_pressed:
+        return "button is pressed"
+    return "button is not pressed"
+
+# Fix the route to match the HTML buttons
+@app.route("/led/on")
+def led_on():
+    led_list[0].on()
+    return render_template("main.html", led_state=True)
+
+@app.route("/led/off")
+def led_off():
+    led_list[0].off()
+    return render_template("main.html", led_state=False)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
+
+
+
+
+mkdir templates
+cd templates
+nano main.html
+
+
+
+HTML code :
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-g">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPi LED Control</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #282c34; color: white;}
+        .container { max-width: 400px; margin: auto; padding: 20px; background-color: #3c4049; border-radius: 10px;}
+        h1 { color: #61dafb; }
+        .button { display: inline-block; padding: 15px 25px; font-size: 24px; cursor: pointer; text-align: center; text-decoration: none;
+                  outline: none; color: #fff; border: none; border-radius: 15px; box-shadow: 0 5px #999; }
+        .button-on { background-color: #4CAF50; }
+        .button-on:active { background-color: #3e8e41; box-shadow: 0 3px #666; transform: translateY(4px); }
+        .button-off { background-color: #f44336; margin-left: 20px; }
+        .button-off:active { background-color: #da190b; box-shadow: 0 3px #666; transform: translateY(4px); }
+        .status { margin-top: 30px; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>💡 Raspberry Pi LED Control</h1>
+        <p>Click a button to control the GPIO LED.</p>
+        <a href="/led/on" class="button button-on">Turn ON</a>
+        <a href="/led/off" class="button button-off">Turn OFF</a>
+        <div class="status">
+            <p>Current LED Status: <strong>{{ 'ON' if led_state else 'OFF' }}</strong></p>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+cd ~/web-server
+python3 app.py
