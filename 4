@@ -1,5 +1,4 @@
-## 1)	Servo Motor:
-```python
+1) Servo Motor:
 import time
 from gpiozero import AngularServo
 
@@ -30,10 +29,10 @@ try:
 except KeyboardInterrupt:
     print("\nProgram stopped by user.")
     servo.close()
-```
 
-## 2)	ULN2003 Stepper Motor:
-```python
+
+
+2) ULN2003 Stepper Motor:
 from gpiozero import OutputDevice
 from time import sleep
 # Pin Definitions
@@ -74,10 +73,13 @@ try:
         step_motor(steps, direction)
 except KeyboardInterrupt:
     print("Program stopped by user")
-```
 
-## 3) L298N (Try once by removing the Cap joining ENA and ENB if motor doesnt spin)
-```python
+
+
+
+3) L298N (Try once by removing the Cap joining ENA and ENB if motor doesnt spin)
+
+
 from gpiozero import OutputDevice, PWMOutputDevice
 from time import sleep
 # Pin Definitions
@@ -124,4 +126,3 @@ try:
         step_motor(steps, direction)
 except KeyboardInterrupt:
     print("Program stopped by user")
-```
